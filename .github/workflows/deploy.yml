@@ -1,0 +1,40 @@
+name: Deploy to Production
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Deploy to server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /var/www/whatsapp_saas
+          git pull origin main
+          pip install -r requirements.txt
+          # Restart the application service (e.g., systemd service for uvicorn)
+          # sudo systemctl restart whatsapp_saas.service
+          # For now, a simple restart command. User will need to configure systemd service.
+          pkill -f "uvicorn app.main:app"
+          nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
