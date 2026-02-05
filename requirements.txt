@@ -14,3 +14,5 @@ python-dotenv
 jinja2
 psutil
 email-validator
+jinja2
+aiofiles
