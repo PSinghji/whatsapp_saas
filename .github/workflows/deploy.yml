@@ -20,20 +20,9 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          # 1. Navigate to project folder
-          cd /var/www/whatsapp_saas
-          
-          # 2. Pull the latest code from GitHub
-          git pull origin main
-          
-          # 3. Update dependencies inside the virtual environment
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          
-          # 4. Restart the systemd service (The professional way)
-          # This triggers the start_gunicorn.sh script safely
-          sudo systemctl restart whatsapp_saas.service
-          
-          # 5. Verify the service is active after restart
-          sudo systemctl is-active --quiet whatsapp_saas.service && echo "SaaS Deployed Successfully!"
+           cd /var/www/whatsapp_saas
+           git pull origin main
+           source venv/bin/activate
+           pip install -r requirements.txt
+           # Simply restart the service, systemd handles the rest
+           sudo systemctl restart whatsapp_saas.service
