@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WhatsApp SaaS{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .sidebar-active { background-color: #374151; border-left: 4px solid #10B981; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+    <div class="flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <div class="bg-gray-800 shadow-xl h-16 fixed bottom-0 mt-12 md:relative md:h-screen z-10 w-full md:w-64">
+            <div class="md:mt-12 md:w-64 md:fixed md:left-0 md:top-0 content-center md:content-start text-left justify-between">
+                <div class="p-6 text-white text-2xl font-bold border-b border-gray-700 hidden md:block">
+                    WA SaaS Admin
+                </div>
+                <ul class="list-reset flex flex-row md:flex-col py-0 md:py-3 px-1 md:px-2 text-center md:text-left">
+                    <li class="mr-3 flex-1">
+                        <a href="/dashboard" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500 {% if active_page == 'dashboard' %}sidebar-active{% endif %}">
+                            <i class="fas fa-chart-line pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="mr-3 flex-1">
+                        <a href="/devices" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-purple-500 {% if active_page == 'devices' %}sidebar-active{% endif %}">
+                            <i class="fa fa-mobile-alt pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Devices</span>
+                        </a>
+                    </li>
+                    <li class="mr-3 flex-1">
+                        <a href="/campaigns" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-blue-500 {% if active_page == 'campaigns' %}sidebar-active{% endif %}">
+                            <i class="fa fa-envelope pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Campaigns</span>
+                        </a>
+                    </li>
+                    <li class="mr-3 flex-1">
+                        <a href="/billing" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-green-500 {% if active_page == 'billing' %}sidebar-active{% endif %}">
+                            <i class="fa fa-wallet pr-0 md:pr-3"></i><span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Billing</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content flex-1 bg-gray-100 mt-12 md:mt-2 pb-24 md:pb-5">
+            <div class="bg-gray-800 pt-3">
+                <div class="rounded-tl-3xl bg-gradient-to-r from-blue-900 to-gray-800 p-4 shadow text-2xl text-white">
+                    <h3 class="font-bold pl-2">{% block header %}Dashboard{% endblock %}</h3>
+                </div>
+            </div>
+            <div class="p-6">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Widget -->
+    <div id="chatbot-container" class="fixed bottom-20 right-6 md:bottom-6 z-50">
+        <button onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg focus:outline-none">
+            <i class="fas fa-robot text-2xl"></i>
+        </button>
+        <div id="chat-window" class="hidden absolute bottom-16 right-0 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col">
+            <div class="bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+                <span class="font-bold">Support Bot</span>
+                <button onclick="toggleChat()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="chat-messages" class="h-64 overflow-y-auto p-4 space-y-2 text-sm">
+                <div class="bg-gray-100 p-2 rounded">Hello! How can I help you today?</div>
+            </div>
+            <div class="p-2 border-t">
+                <input type="text" id="chat-input" placeholder="Type a message..." class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const window = document.getElementById('chat-window');
+            window.classList.toggle('hidden');
+        }
+
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('chat-messages');
+
+        chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && this.value.trim() !== '') {
+                const userMsg = this.value;
+                appendMessage('user', userMsg);
+                this.value = '';
+                
+                // Simulate bot response
+                setTimeout(() => {
+                    const response = getBotResponse(userMsg);
+                    appendMessage('bot', response);
+                }, 500);
+            }
+        });
+
+        function appendMessage(sender, text) {
+            const div = document.createElement('div');
+            div.className = sender === 'user' ? 'bg-blue-100 p-2 rounded text-right ml-8' : 'bg-gray-100 p-2 rounded mr-8';
+            div.innerText = text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function getBotResponse(input) {
+            const menu = {
+                "1": "Campaign Help: Go to Messaging > Campaigns to start.",
+                "2": "Credit & Billing: Check your balance in the Billing section.",
+                "3": "Device Issues: Ensure your phone is connected and QR is scanned.",
+                "4": "API Help: Documentation is at /docs.",
+                "5": "Support: Open a ticket in the Support section."
+            };
+            return menu[input] || "I'm here to help! Choose an option:\n1. Campaigns\n2. Billing\n3. Devices\n4. API\n5. Support";
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

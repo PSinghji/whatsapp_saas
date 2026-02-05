@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Devices - WA SaaS{% endblock %}
+
+{% block header %}WhatsApp Devices{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Add New Device Card -->
+    <div class="bg-white p-6 rounded-lg shadow-md border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors" onclick="openAddDeviceModal()">
+        <i class="fas fa-plus-circle text-4xl text-gray-400 mb-2"></i>
+        <span class="text-gray-600 font-medium">Add New Device</span>
+    </div>
+
+    <!-- Example Device Card -->
+    {% for device in devices %}
+    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h4 class="text-xl font-bold text-gray-800">{{ device.name }}</h4>
+                <p class="text-sm text-gray-500">ID: {{ device.session_id }}</p>
+            </div>
+            <span class="px-2 py-1 rounded text-xs {% if device.status == 'connected' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                {{ device.status|capitalize }}
+            </span>
+        </div>
+        <div class="flex space-x-2">
+            {% if device.status != 'connected' %}
+            <button onclick="showQR('{{ device.id }}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm font-medium">
+                Scan QR
+            </button>
+            {% endif %}
+            <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded text-sm font-medium">
+                Settings
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- QR Modal -->
+<div id="qr-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg max-w-sm w-full text-center">
+        <h3 class="text-xl font-bold mb-4">Scan WhatsApp QR</h3>
+        <div id="qr-container" class="bg-gray-100 h-64 w-64 mx-auto mb-4 flex items-center justify-center">
+            <i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
+        </div>
+        <p class="text-sm text-gray-600 mb-6">Open WhatsApp on your phone and scan this code to connect.</p>
+        <button onclick="closeQR()" class="w-full bg-gray-800 text-white py-2 rounded font-medium">Close</button>
+    </div>
+</div>
+
+<script>
+    function showQR(deviceId) {
+        document.getElementById('qr-modal').classList.remove('hidden');
+        // In real app, fetch QR from API: /api/v1/devices/{deviceId}/qr
+        setTimeout(() => {
+            document.getElementById('qr-container').innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WA_MOCK_QR" alt="QR Code">';
+        }, 1500);
+    }
+    function closeQR() {
+        document.getElementById('qr-modal').classList.add('hidden');
+    }
+</script>
+{% endblock %}
