@@ -33,7 +33,7 @@ pip install -r requirements.txt
 # We'll use a simple uvicorn command for demonstration, but Gunicorn is recommended for production.
 # You might want to use a process manager like systemd or supervisor to keep it running.
 
-echo "Deployment complete. You can now run the application."
+echo "Deployment complete. You can now run the applications."
 
 # Example of how to run (for development/testing):
 # uvicorn app.main:app --host 0.0.0.0 --port 8000
